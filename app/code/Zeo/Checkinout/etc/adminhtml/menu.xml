@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Backend/etc/menu.xsd">
+    <menu>
+        <add id="zeo::base" title="Zeo" module="Zeo_Checkinout" sortOrder="90" resource="Zeo_Checkinout::main"/>
+        <add id="zeo_checkinout::checkinout" title="Checkinout" module="Zeo_Checkinout" sortOrder="0" parent="zeo::base"  resource="Zeo_Checkinout::main"/>
+        <add id="zeo_checkinout::day" title="Day" module="Zeo_Checkinout" sortOrder="10" parent="zeo_checkinout::checkinout" action="zeo_checkinout/day/" resource="Zeo_Checkinout::main"/>
+        <add id="zeo_checkinout::hour" title="Hour" module="Zeo_Checkinout" sortOrder="10" parent="zeo_checkinout::checkinout" action="zeo_checkinout/hour/" resource="Zeo_Checkinout::main"/>
+    </menu>
+</config>

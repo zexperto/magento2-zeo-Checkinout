@@ -1,0 +1,31 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+
+	<head>
+        <title>Employees</title>
+        <!-- 
+		demo
+		<css src="Zeo_Checkinout::css/css.css"/>
+		<script src="Zeo_Checkinout::js/js.js"/>
+		<css src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
+		<script src="path/file.js" defer="defer"/>
+		<link src="http://url.com" src_type="url"/>
+		<remove src="path/remove/file.css"/>
+
+		-->
+    </head> 
+
+   <update handle="customer_account"/>
+    <body>
+    
+     <!-- and for the page title: -->
+            <referenceBlock name="page.main.title">
+               <action method="setPageTitle">
+                  <argument translate="true" name="title" xsi:type="string">Employees</argument>
+               </action>
+            </referenceBlock>
+            
+        <referenceContainer name="content">
+            <block class="Zeo\Checkinout\Block\Employee\Index" name="checkinout_employee_index" template="Zeo_Checkinout::checkinout_employee_index.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

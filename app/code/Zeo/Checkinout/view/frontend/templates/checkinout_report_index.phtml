@@ -1,0 +1,73 @@
+<?php
+$employees = $this->getEmployees();
+
+?>
+<?php echo $block->escapeHtml($this->getPostValue('start_date')) ?>
+
+
+<?php
+
+$params = $this->getPostValues();
+$result = $this->getReportResult();
+
+$employee_name = "";
+
+?>
+
+
+<form class="form report" enctype="multipart/form-data"
+	action="<?php echo $this->getFormAction(); ?>" id="report-form"
+	method="post">
+	
+	<table style="width:100%">
+	<tr>
+		<td><?php echo __("Employee"); ?></td>
+		<td>
+		
+					<select name="employee_id">
+				<option></option>
+        		<?php foreach ($employees as $employee):?>
+        		<?php
+            $employee_name = $params["employee_id"] == $employee->getEntityId() ? $employee->getName() : "";
+            ?>
+        			<option value="<?php echo $employee->getEntityId() ?>"
+        					<?php echo $params["employee_id"]== $employee->getEntityId()? "selected":""; ?>><?php echo $employee->getName(); ?></option>
+        		<?php endforeach;?>
+        		  
+        			</select>
+		</td>
+	</tr>
+	<tr>
+		<td><?php echo __("From Date"); ?></td>
+		<td>
+			<input type="date" name="start_date"	value="<?php echo  $params["start_date"]?>">
+		</td>
+	</tr>
+	<tr>
+		<td><?php echo __("To Date"); ?></td>
+		<td>
+			<input type="date" name="end_date" value="<?php echo  $params["end_date"]?>">
+		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td>
+			<input class="action primary" type="submit" value="Submit">
+		</td>
+	</tr>
+	</table>
+	
+</form>
+
+
+<?php 
+$type =  $this->getHelper()->getTypes();
+echo $this->getLayout()
+->createBlock('Magento\Framework\View\Element\Template')
+->setTemplate('Zeo_Checkinout::report.phtml')
+->setData("result", $this->getReportResult())
+->setData("type", $type)
+->setData("params", $params)
+->toHtml();
+?>
+

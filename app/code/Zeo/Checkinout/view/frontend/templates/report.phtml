@@ -1,0 +1,195 @@
+<style>
+.odd {
+	background-color: #f5f5f5;
+}
+
+.even {
+	background-color: #FAF9F9;
+}
+
+@media print {
+	.report {
+		display: none
+	}
+	.media-print {
+		display: none
+	}
+}
+.report-header {
+    display: grid
+}
+.report-header table{
+    line-height: 0.2em;
+    width: 320px;
+    float: right;
+}
+</style>
+<?php
+$result = $this->getResult();
+$type = $this->getType();
+$params = $this->getParams();
+
+?>
+<script type="text/javascript">
+        function PrintDiv(div) {
+        	window.print();
+        }
+    </script>
+<div class="block block-dashboard-info">
+	
+
+	
+	<div class="report-header">
+             <span>
+                <table>
+                <tr>
+                					<td>
+                				<?php
+                     $dd = sprintf("Name: <strong>%1s</strong>", $result["employee_name"]);
+                        echo $dd;
+                    ?>
+                				</td>
+                				</tr>
+                				<tr>
+                					<td>
+                				<?php
+                    $dd = sprintf("Logged Time <strong>%1s</strong>, Avg. (%2s)", $result["logged_time"], 
+                        $result["average_hours_per_day"]);
+                    echo $dd;
+                    ?>
+                				</td>
+                				</tr>
+                
+                				<tr>
+                				
+                				
+                				<tr>
+                					<td>
+                				<?php
+                    $dd = sprintf("From <strong>%1s</strong> to <strong>%2s</strong>  (%3s Days)", $result["start_date"], 
+                        $result["end_date"], $result["total_days"]);
+                    echo $dd;
+                    ?>
+                				</td>
+                				</tr>
+                    				<tr>
+                    					<td>
+                            				<?php
+                                            $dd = sprintf("Required Time <strong>%1s d</strong> (<strong>%2s</strong>)", $result["working_days"], 
+                                                $result["required_time"]);
+                                            echo $dd;
+                                            ?>
+                    					</td>
+                    				</tr>
+                				<tr>
+                    					<td>
+                        				<?php
+                                        $dd = sprintf("Completed Time <strong>%1s</strong>, Avg. (%2s)", $result["complete_time"], 
+                                            $result["average_hours_work_per_day"]);
+                                        echo $dd;
+                                        ?>
+                    				</td>
+                				</tr>
+                				<tr>
+                       				<td>
+                    					<?php
+                                            $dd = sprintf("Allowed Breaks <strong>%1s</strong>", $result["allowed_break"]);
+                                            echo $dd;
+                                        ?>
+                        			</td>
+                				</tr>
+                				<tr>
+                       				<td>
+                    					<?php
+                                            $dd = sprintf("Completed Breaks <strong>%1s</strong>", $result["breaks"]);
+                                            echo $dd;
+                                        ?>
+                        			</td>
+                				</tr>
+                				<tr>
+                       				<td>
+                    					<?php
+                    					$dd = sprintf("Extra Hours <strong>%1s</strong> + <strong>%2s</strong>", $result["extra_work"], $result["extra_break_hour"]);
+                                            echo $dd;
+                                        ?>
+                        			</td>
+                				</tr>
+                				<tr>
+                       				<td>
+                    					<?php
+                    					$dd = sprintf("Weekend Hours <strong>%1s</strong>", $result["weekend_hours"]);
+                                            echo $dd;
+                                        ?>
+                        			</td>
+                				</tr>
+                				<tr>
+                					<td><a style="float: right" class="media-print" href="#"
+                						onclick="PrintDiv('report_print');"><?php echo __("Print Report")?> </a>
+					</td>
+				</tr>
+			</table>
+</span>
+                	</div>
+	
+
+	
+                          <?php $i=0; foreach ($result["days"] as $day) :?>
+                          <?php $hours = $day["hours"];?>
+                          <?php $i++;?>
+                          <div
+		class="<?php echo ($i%2==1?"odd":"even")?>"
+		style="margin-bottom: 20px;">
+		<div class="">
+			<span>
+                            			<?php echo __("Day");?>:
+                            			
+                            			
+                            			<strong>
+                            			<?php
+                            			$date=date_create($day["day"]);
+                                        echo date_format($date,"Y-m-d(D)");
+                                        ?>
+                            			<?php //echo $day["day"];?>
+                            			</strong>
+			</span>| <span><?php echo __("Total Hours")?>:
+                            			<strong><?php echo $day["line_total"];?></strong>
+			</span>| <span><?php echo __("Time")?>:
+                            			<strong><?php echo $day["line_total_hours"];?></strong>,
+				<strong><?php echo $day["line_total_minutes"];?></strong> </span>
+				
+				</span>| <span><?php echo __("Total Hours (Work)")?>:
+                            			<strong><?php echo $day["line_total_work"];?></strong>
+			</span>| <span><?php echo __("Time")?>:
+                            			<strong><?php echo $day["line_total_hours_work"];?></strong>,
+				<strong><?php echo $day["line_total_minutes_work"];?></strong> </span>
+				
+				
+		</div>
+		<div class="block-content">
+			<div class="">
+				<table style="width: 100%;    line-height: 1px;    font-size: 0.9em;">
+					<tr>
+						<th><?php echo __("Start time") ?></th>
+						<th><?php echo __("End time") ?></th>
+						<th><?php echo __("Total Time") ?></th>
+						<th><?php echo __("Total") ?></th>
+						<th><?php echo __("Type") ?></th>
+					</tr>
+                                         <?php foreach ($hours as $hour) :?>
+                                         <?php //$totals += $hour["total"]?>
+                                        	<tr>
+						<td><?php echo $hour["start_time"]?></td>
+						<td><?php echo $hour["end_time"]?></td>
+						<td><?php echo $hour["total_time"]?></td>
+						<td><?php echo $hour["total"]?></td>
+						<td><?php echo $type[$hour["type"]]?></td>
+					</tr>
+                                        	 <?php endforeach;?>
+                                        </table>
+
+			</div>
+		</div>
+	</div>
+            			<?php endforeach;?>
+            </div>
+

@@ -1,0 +1,215 @@
+
+<?php 
+$date = $this->getDate();
+$time = $this->getTime();
+$type =  $this->getHelper()->getTypes();
+$result = $this->getReportResult();
+$timer_on = 0;
+//$date1 = new DateTime("now", new DateTimeZone('America/Toronto') );
+// echo $date1->format('Y-m-d H:i:s');
+$checkedin_model = $this->getCheckedInModel();
+
+$counter = "00:00:00";
+$is_checkedin_model = false;
+$start_time = "00:00:00";
+if($checkedin_model && $checkedin_model->getEntityId()) {
+    $start_time = $checkedin_model->getStartTime();
+    
+   
+    
+    $counter = date('H:i:s', strtotime($time) - strtotime($start_time) ); // perform calculation
+    $timer_on = 1;
+    $is_checkedin_model = true;
+    
+}
+
+
+?>
+<script>
+var timer_on = <?php echo $timer_on ?>;
+
+require(['jquery', 'jquery/ui'], function($){ 
+
+	function checkTime(i) {
+	    if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+	    return i;
+	}
+	function startTime() {
+		  var today = new Date();
+		    var h = today.getHours();
+		    var m = today.getMinutes();
+		    var s = today.getSeconds();
+		    m = checkTime(m);
+		    s = checkTime(s);
+		    h = checkTime(h);
+		    $("#time-now").text(h + ":" + m + ":" + s);
+			var t =  setTimeout(startTime, 1000);
+	}
+	function count()
+	{
+			var time_shown = $("#realtime").text();
+	        var time_chunks = time_shown.split(":");
+	        var hour, mins, secs;
+	 
+	        hour=Number(time_chunks[0]);
+	        mins=Number(time_chunks[1]);
+	        secs=Number(time_chunks[2]);
+	        secs++;
+	            if (secs==60){
+	                secs = 0;
+	                mins=mins + 1;
+	               } 
+	              if (mins==60){
+	                mins=0;
+	                hour=hour + 1;
+	              }
+	              if (hour==24){
+	                hour=0;
+	              }
+	 
+	        $("#realtime").text(checkTime(hour) +":" + checkTime(mins) + ":" + checkTime(secs));
+	 
+	}
+	
+	function startCount()
+	{
+		timer = setInterval(count,1000);
+	}
+		
+	$( document ).ready(function() {
+		startTime();
+		if(timer_on ==1 ) {
+			startCount();
+		}
+	});
+
+	$("#checkin").on('click', function(data) {
+		var button = this;
+		$(button).prop('disabled', true);
+		var FORM_KEY = $("input[name=form_key]").val();
+		;
+
+		var jqxhr = $.post( "<?php echo $this->getUrl('checkinout/index/CheckinPost')?>",{ form_key: FORM_KEY }, function() {
+		  //alert("success");
+		})
+		  .done(function(response) {
+			  if(response == true ) {
+				  location.reload();
+			  }
+		  })
+		  .fail(function() {
+		    alert( "error" );
+		  })
+		  .always(function() {
+			 $(button).prop('disabled', false);
+		   	 //alert( "finished" );
+		  });
+	});
+
+	$("#checkout").on('click', function(data) {
+		var button = this;
+		$(button).prop('disabled', true);
+		var FORM_KEY = $("input[name=form_key]").val();
+		;
+
+		var jqxhr = $.post( "<?php echo $this->getUrl('checkinout/index/CheckoutPost')?>",{ form_key: FORM_KEY }, function() {
+		  //alert("success");
+		})
+		  .done(function(response) {
+			  if(response == true ) {
+				  location.reload();
+			  }
+		  })
+		  .fail(function() {
+		    alert( "error" );
+		  })
+		  .always(function() {
+			 $(button).prop('disabled', false);
+		   	 //alert( "finished" );
+		  });
+	});
+
+	function checkOutType(button, type) {
+		var button = this;
+		$(button).prop('disabled', true);
+		var FORM_KEY = $("input[name=form_key]").val();
+		;
+		var url = "<?php echo $this->getUrl('checkinout/index/CheckoutPost',['type'=>'{type}'])?>";
+
+		var new_url = url.replace("{type}", type);
+		var jqxhr = $.post( new_url,{ form_key: FORM_KEY }, function() {
+		  //alert("success");
+		})
+		  .done(function(response) {
+			  if(response == true ) {
+				  location.reload();
+			  }
+		  })
+		  .fail(function() {
+		    alert( "error" );
+		  })
+		  .always(function() {
+			 $(button).prop('disabled', false);
+		   	 //alert( "finished" );
+		  });
+	}
+    $("#checkoutForBreak").on('click', function(data) {
+    	checkOutType(this,"start_break");
+    	});
+	$("#checkoutFromBreak").on('click', function(data) {
+		checkOutType(this,"end_break");
+    	});
+});
+
+
+</script>
+<?php echo $block->getBlockHtml('formkey'); ?>
+<table style="width:100%" class="report">
+	<tr>
+		<td><?php echo $date; ?></td>
+		<td>
+			<div id="time-now"> <?php echo $time; ?></div>
+		</td>
+	</tr>
+
+	<tr>
+		<td><?php echo __("Start Time") ?></td>
+		<td>
+			<div id="time-now"> <?php echo $start_time; ?></div>
+		</td>
+	</tr>
+	<tr>
+		<td><span id="realtime"><?php echo $counter?></span></td>
+		<td>
+		<?php if($is_checkedin_model == false):?>
+    		<button type="button" title="<?php echo __("Check in") ?>" id="checkin" class="action tocart primary">
+                <span><?php echo __("Check in") ?></span>
+            </button>
+        <?php else:?>
+        	<?php if($checkedin_model->getType() == \Zeo\Checkinout\Model\System\Config\Type::BREAK):?>
+        	<button type="button" title="<?php echo __("End Break") ?>" id="checkoutFromBreak" class="action">
+                <span><?php echo __("End Break") ?></span>
+            </button>
+        	<?php else:?>
+        	<button type="button" title="<?php echo __("Start Break") ?>" id="checkoutForBreak" class="action">
+                <span><?php echo __("Start Break") ?></span>
+            </button>
+            
+            <button type="button" title="<?php echo __("Check out") ?>" id="checkout" class="action tocart primary">
+                <span><?php echo __("Check out") ?></span>
+            </button>
+            <?php endif;?>
+        <?php endif;?>
+		</td>
+	</tr>
+</table>
+		
+
+<?php 
+echo $this->getLayout()
+->createBlock('Magento\Framework\View\Element\Template')
+->setTemplate('Zeo_Checkinout::report.phtml')
+->setData("result",$this->getReportResult())
+->setData("type",$type)
+->toHtml();
+?>

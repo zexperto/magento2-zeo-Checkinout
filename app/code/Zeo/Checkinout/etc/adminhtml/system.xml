@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Location: magento2_root/app/code/Vendorname/Extensionname/etc/adminhtml/system.xml
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="zeo_extension" translate="label" sortOrder="1000">
+            <label>Zeo Extensions</label>
+        </tab>
+        <section id="zeo_checkinout_section" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Checkinout</label>
+            <tab>zeo_extension</tab>
+            <resource>Zeo_Extensions::config</resource>
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="employee_groups" translate="label" type="multiselect" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Employee Groups</label>
+                     <source_model>Magento\Customer\Model\Config\Source\Group</source_model>  
+                </field>
+                 <field id="manager_groups" translate="label" type="multiselect" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Manager Groups</label>
+                     <source_model>Magento\Customer\Model\Config\Source\Group</source_model>  
+                </field>
+            </group>
+        </section>
+       
+    </system>
+</config>
