@@ -227,8 +227,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->_customerSession->getCustomer()->getId();
     }
     
-    public function getWeekEndHours($params) {
-       $employee_id = $params["employee_id"];
+    public function getWeekEndTotals($params) {
+        $employee_id = $params["employee_id"];
         $start_date = $params["start_date"];
         $end_date = $params["end_date"];
         
@@ -236,17 +236,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $collection->addFieldToFilter("customer_id", $employee_id);
         $collection->addFieldToFilter("day_sequence", ["in"=>[6,7]]);
         $collection->addFieldToFilter('day', array('from'=>$start_date, 'to'=>$end_date));
-
+        
         $hours_table   = $this->_resource->getTableName('zeo_checkinout_hour'); // It will return table with prefix
         $collection->getSelect()->join(  array('hour' => $hours_table),   'main_table.entity_id = hour.day_id',  array('SUM(total) as totals' ));
         
         $totals = $collection->getFirstItem()->getData("totals");
         
-        $week_end_hoour_format = $this->getHoursMinutesFromMinutes($this->getMinutesFromTotal($totals));
-        
-        
-        return  $week_end_hoour_format;
+        return $totals;
     }
+   
     public function getReportResult($params) {
         
         
@@ -258,7 +256,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         
         $collection = $this->_dayCollectionFactory->create();
         $collection->addFieldToFilter("customer_id", $employee_id);
-        $collection->addFieldToFilter("day_sequence", ["nin"=>[6,7]]);
+      //  $collection->addFieldToFilter("day_sequence", ["nin"=>[6,7]]);
         $collection->addFieldToFilter('day', array('from'=>$start_date, 'to'=>$end_date));
         $collection->setOrder("day","desc");
         
@@ -272,14 +270,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $item["hours"] = $hours_collection->getData();
             
             $line_total = $this->getSumDay($day["entity_id"]);
-            $total += $line_total;
+           
+            if(!in_array($day["day_sequence"],[6,7])){
+                $total += $line_total;
+            }
             $item["line_total"] = $line_total;
             $item["line_total_hours"] = intdiv($line_total * 60, 60)." h";
             $item["line_total_minutes"] = ($line_total * 60) % 60 ." m";
             
             
             $line_total_work = $this->getSumDay($day["entity_id"],"0");
-            $total_work+= $line_total_work;
+            if(!in_array($day["day_sequence"],[6,7])){
+                $total_work+= $line_total_work;
+            }
             $item["line_total_work"] = $line_total_work;
             $item["line_total_hours_work"] = intdiv($line_total_work* 60, 60)." h";
             $item["line_total_minutes_work"] = ($line_total_work* 60) % 60 ." m";
@@ -317,7 +320,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $extra_work_minutes = $this->getMinutesFromTotal($total) - $required_minutes;
         $extra_work_format =   $this->getHoursMinutesFromMinutes($extra_work_minutes);// $this->getHoursMinutesFromMinutes($this->getMinutesFromTotal($total) - $required_time);
         
+        
+        $weekend_totals = $this->getWeekEndTotals($params);
+        $weekend_hoour_format = $this->getHoursMinutesFromMinutes($this->getMinutesFromTotal($weekend_totals));
+
+        $total_logged_time_format = $this->getHoursMinutes($total + $weekend_totals);
+        
         $result = [
+            "total_logged_time"   => $total_logged_time_format,
             "logged_time"   => $logged_time_format,
             "complete_time"     =>$complete_time_format,
             "working_days" => $working_days,
@@ -341,7 +351,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             "breaks" => $complete_break_format,//$this->fix($total_hours- $total_hours_work).":".$this->fix($total_minutes- $total_minutes_work),
             "extra_break_minutes" => $extra_break_minutes = (($allowed_break * 60) - (($total_hours * 60 + $total_minutes)- ($total_hours_work* 60 + $total_minutes_work))),
             "extra_break_hour" => $this->fix((int)($extra_break_minutes/60)).":".$this->fix((int)($extra_break_minutes%60)),
-            "weekend_hours" => $this->getWeekEndHours($params),
+            "weekend_hours" => $weekend_hoour_format,
         ];
         
         //($result["allowed_break"]-$result["breaks"])

@@ -23,6 +23,9 @@
     width: 320px;
     float: right;
 }
+.big-font {
+    font-size: 2em;
+} 
 </style>
 <?php
 $result = $this->getResult();
@@ -51,13 +54,21 @@ $params = $this->getParams();
                 				</td>
                 				</tr>
                 				<tr>
-                					<td>
-                				<?php
-                    $dd = sprintf("Logged Time <strong>%1s</strong>, Avg. (%2s)", $result["logged_time"], 
-                        $result["average_hours_per_day"]);
-                    echo $dd;
-                    ?>
-                				</td>
+                		<td>
+                			<?php
+                                $dd = sprintf("Total Logged Time <span class='big-font'><strong>%1s</strong></span>", $result["total_logged_time"]);
+                                echo $dd;
+                            ?>
+                		</td>
+                		</tr>
+                		<tr>
+                		<td>
+                			<?php
+                                $dd = sprintf("Working Days Time <strong>%1s</strong>, Avg. (%2s)", $result["logged_time"], 
+                                $result["average_hours_per_day"]);
+                                echo $dd;
+                            ?>
+                		</td>
                 				</tr>
                 
                 				<tr>
