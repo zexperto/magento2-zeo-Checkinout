@@ -48,7 +48,7 @@ $params = $this->getParams();
                 <tr>
                 					<td>
                 				<?php
-                     $dd = sprintf("Name: <strong>%1s</strong>", $result["employee_name"]);
+                     $dd = sprintf("Name: <span class='big-font'><strong>%1s</strong></span>", $result["employee_name"]);
                         echo $dd;
                     ?>
                 				</td>
@@ -120,7 +120,7 @@ $params = $this->getParams();
                 				<tr>
                        				<td>
                     					<?php
-                    					$dd = sprintf("Extra Hours <strong>%1s</strong> + <strong>%2s</strong>", $result["extra_work"], $result["extra_break_hour"]);
+                    					$dd = sprintf("Extra Hours <strong>%1s</strong> + <strong>%2s (breaks)</strong>", $result["extra_work"], $result["extra_break_hour"]);
                                             echo $dd;
                                         ?>
                         			</td>
@@ -152,28 +152,24 @@ $params = $this->getParams();
 		style="margin-bottom: 20px;">
 		<div class="">
 			<span>
-                            			<?php echo __("Day");?>:
+                            			<?php //echo __("Day");?>
                             			
                             			
                             			<strong>
                             			<?php
                             			$date=date_create($day["day"]);
-                                        echo date_format($date,"Y-m-d(D)");
+                                        echo date_format($date,"Y-m-d (D)");
                                         ?>
                             			<?php //echo $day["day"];?>
                             			</strong>
-			</span>| <span><?php echo __("Total Hours")?>:
-                            			<strong><?php echo $day["line_total"];?></strong>
-			</span>| <span><?php echo __("Time")?>:
-                            			<strong><?php echo $day["line_total_hours"];?></strong>,
-				<strong><?php echo $day["line_total_minutes"];?></strong> </span>
-				
-				</span>| <span><?php echo __("Total Hours (Work)")?>:
-                            			<strong><?php echo $day["line_total_work"];?></strong>
-			</span>| <span><?php echo __("Time")?>:
-                            			<strong><?php echo $day["line_total_hours_work"];?></strong>,
-				<strong><?php echo $day["line_total_minutes_work"];?></strong> </span>
-				
+			</span>
+			|
+			<span>
+			<?php echo __("Total Hours")?>:<strong><?php echo $day["line_total_hours_format"];?></strong></span>
+			</span>
+			|
+			<span><?php echo __("Total Hours (Work)")?>:<strong><?php echo $day["line_total_hours_work_format"];?></strong>
+			</span>
 				
 		</div>
 		<div class="block-content">

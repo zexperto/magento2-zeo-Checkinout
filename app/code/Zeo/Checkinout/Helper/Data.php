@@ -275,17 +275,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $total += $line_total;
             }
             $item["line_total"] = $line_total;
-            $item["line_total_hours"] = intdiv($line_total * 60, 60)." h";
-            $item["line_total_minutes"] = ($line_total * 60) % 60 ." m";
-            
+            //$item["line_total_hours"] = intdiv($line_total * 60, 60)." h";
+            //$item["line_total_minutes"] = ($line_total * 60) % 60 ." m";
+            $item["line_total_hours_format"] = $this->getHoursMinutes($line_total);
             
             $line_total_work = $this->getSumDay($day["entity_id"],"0");
             if(!in_array($day["day_sequence"],[6,7])){
                 $total_work+= $line_total_work;
             }
             $item["line_total_work"] = $line_total_work;
-            $item["line_total_hours_work"] = intdiv($line_total_work* 60, 60)." h";
-            $item["line_total_minutes_work"] = ($line_total_work* 60) % 60 ." m";
+            //$item["line_total_hours_work"] = intdiv($line_total_work* 60, 60)." h";
+            //$item["line_total_minutes_work"] = ($line_total_work* 60) % 60 ." m";
+            
+            $item["line_total_hours_work_format"] = $this->getHoursMinutes($line_total_work);
             
             $data[] = $item;
             
@@ -345,8 +347,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             "total_minutes" => ($total_minutes = ($total* 60) % 60) ." m",
             "total_hours_work" => ($total_hours_work =intdiv($total_work* 60, 60))." h",
             "total_minutes_work" => ($total_minutes_work=($total_work* 60) % 60) ." m",
-            "average_hours_per_day" => intdiv(($total/$working_days)* 60, 60)." h" .":".(($total/$working_days)* 60) % 60 ." m",
-            "average_hours_work_per_day" => intdiv(($total_work/$working_days)* 60, 60)." h" .":".(($total_work/$working_days)* 60) % 60 ." m",
+            "average_hours_per_day" =>   $this->getHoursMinutes($total/$working_days),//intdiv(($total/$working_days)* 60, 60)." h" .":".(($total/$working_days)* 60) % 60 ." m",
+            "average_hours_work_per_day" =>  $this->getHoursMinutes($total_work/$working_days),//intdiv(($total_work/$working_days)* 60, 60)." h" .":".(($total_work/$working_days)* 60) % 60 ." m",
             "extra_work" =>$extra_work_format,// $this->fix($total_hours- $required_time- $allowed_break) . ":".$this->fix($total_minutes),
             "breaks" => $complete_break_format,//$this->fix($total_hours- $total_hours_work).":".$this->fix($total_minutes- $total_minutes_work),
             "extra_break_minutes" => $extra_break_minutes = (($allowed_break * 60) - (($total_hours * 60 + $total_minutes)- ($total_hours_work* 60 + $total_minutes_work))),
