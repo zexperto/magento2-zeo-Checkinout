@@ -169,10 +169,10 @@ $params = $this->getParams();
 			<div class="">
 				<table style="width: 100%;    line-height: 1px;    font-size: 0.9em;">
 					<tr>
-						<th><?php echo __("Start time") ?></th>
-						<th><?php echo __("End time") ?></th>
-						<th><?php echo __("Total Time") ?></th>
+						<th><?php echo __("In") ?></th>
+						<th><?php echo __("Out") ?></th>
 						<th><?php echo __("Total") ?></th>
+						<!-- <th><?php echo __("Total") ?></th>  -->
 						<th><?php echo __("Type") ?></th>
 					</tr>
                                          <?php foreach ($hours as $hour) :?>
@@ -181,7 +181,7 @@ $params = $this->getParams();
 						<td><?php echo $hour["start_time"]?></td>
 						<td><?php echo $hour["end_time"]?></td>
 						<td><?php echo $hour["total_time"]?></td>
-						<td><?php echo $hour["total"]?></td>
+						<!-- <td><?php echo $hour["total"]?></td> -->
 						<td><?php echo $type[$hour["type"]]?></td>
 					</tr>
                                         	 <?php endforeach;?>

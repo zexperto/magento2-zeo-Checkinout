@@ -1,6 +1,9 @@
 
 <?php 
 $date = $this->getDate();
+$date=date_create($date);
+$date =  date_format($date,"D, M d, Y");
+
 $time = $this->getTime();
 $type =  $this->getHelper()->getTypes();
 $result = $this->getReportResult();
