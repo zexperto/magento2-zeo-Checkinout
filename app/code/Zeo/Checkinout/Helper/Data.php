@@ -258,7 +258,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         
         $collection = $this->_dayCollectionFactory->create();
         $collection->addFieldToFilter("customer_id", $employee_id);
-        
+        $collection->addFieldToFilter("day_sequence", ["nin"=>[6,7]]);
         $collection->addFieldToFilter('day', array('from'=>$start_date, 'to'=>$end_date));
         $collection->setOrder("day","desc");
         
