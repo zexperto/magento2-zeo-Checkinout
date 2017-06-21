@@ -197,7 +197,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         // Last day of the month.
         $last_day = date('Y-m-t', strtotime($query_date));
         
-        $customer_id = $this->_customerSession->getCustomer()->getId(); 
+        $customer_id = $this->getCurrentCustomerId();//$this->_customerSession->getCustomer()->getId(); 
         $collection = $this->_dayCollectionFactory->create();
         $collection->addFieldToFilter("customer_id", $customer_id);
         
@@ -224,7 +224,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     }
     public function getCurrentCustomerId() {
-        return $this->_customerSession->getCustomer()->getId();
+        $_customerSession= $this->_objectManager->create('\Magento\Customer\Model\Session');
+        return $_customerSession->getCustomer()->getId();
     }
     
     public function getWeekEndTotals($params) {
@@ -423,7 +424,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $day_sequance = date('w', strtotime($day));
         $start_time = $this->getDate("time");
         
-        $customer_id = $this->_customerSession->getCustomer()->getId();
+        $customer_id = $this->getCurrentCustomerId();
         $collection = $this->_dayCollectionFactory->create();
         $collection->addFieldToFilter("day", $day);
         $collection->addFieldToFilter("customer_id", $customer_id);
@@ -474,7 +475,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $day = $this->getDate("day");
         $end_time = $this->getDate("time");
         
-        $customer_id = $this->_customerSession->getCustomer()->getId();
+        $customer_id = $this->getCurrentCustomerId();
         $collection = $this->_dayCollectionFactory->create();
         $collection->addFieldToFilter("day", $day);
         $collection->addFieldToFilter("customer_id", $customer_id);
