@@ -235,7 +235,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         
         $collection = $this->_dayCollectionFactory->create();
         $collection->addFieldToFilter("customer_id", $employee_id);
-        $collection->addFieldToFilter("day_sequence", ["in"=>[6,7]]);
+        $collection->addFieldToFilter("day_sequence", ["in"=>[6,7,0]]);
         $collection->addFieldToFilter('day', array('from'=>$start_date, 'to'=>$end_date));
         
         $hours_table   = $this->_resource->getTableName('zeo_checkinout_hour'); // It will return table with prefix
@@ -272,7 +272,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             
             $line_total = $this->getSumDay($day["entity_id"]);
            
-            if(!in_array($day["day_sequence"],[6,7])){
+            if(!in_array($day["day_sequence"],[6,7,0])){
                 $total += $line_total;
             }
             $item["line_total"] = $line_total;
@@ -281,7 +281,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $item["line_total_hours_format"] = $this->getHoursMinutes($line_total);
             
             $line_total_work = $this->getSumDay($day["entity_id"],"0");
-            if(!in_array($day["day_sequence"],[6,7])){
+            if(!in_array($day["day_sequence"],[6,7,0])){
                 $total_work+= $line_total_work;
             }
             $item["line_total_work"] = $line_total_work;
