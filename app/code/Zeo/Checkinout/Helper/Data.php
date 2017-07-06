@@ -113,7 +113,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
          if($day_id >0) {
              $hourCollection = $this->_hourCollectionFactory->create();
              $hourCollection->addFieldToFilter("day_id", $day_id);
-             $hourCollection->addFieldToFilter("end_time", "00:00:00");
+             $hourCollection->addFieldToFilter("end_time", "0000-00-00 00:00:00");
              if($hourCollection->getSize()>0) {
                  return $hourCollection->getFirstItem()->getType();
              }
@@ -132,7 +132,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if($day_id >0) {
             $hourCollection = $this->_hourCollectionFactory->create();
             $hourCollection->addFieldToFilter("day_id", $day_id);
-            $hourCollection->addFieldToFilter("end_time", "00:00:00");
+            $hourCollection->addFieldToFilter("end_time", "0000-00-00 00:00:00");
             $hour_model = $hourCollection->getFirstItem();
             return  $hour_model;
         }
@@ -348,8 +348,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             "total_minutes" => ($total_minutes = ($total* 60) % 60) ." m",
             "total_hours_work" => ($total_hours_work =intdiv($total_work* 60, 60))." h",
             "total_minutes_work" => ($total_minutes_work=($total_work* 60) % 60) ." m",
-            "average_hours_per_day" =>   $this->getHoursMinutes($total/$working_days),//intdiv(($total/$working_days)* 60, 60)." h" .":".(($total/$working_days)* 60) % 60 ." m",
-            "average_hours_work_per_day" =>  $this->getHoursMinutes($total_work/$working_days),//intdiv(($total_work/$working_days)* 60, 60)." h" .":".(($total_work/$working_days)* 60) % 60 ." m",
+            "average_hours_per_day" => $working_days != 0?$this->getHoursMinutes($total/$working_days):"0",//intdiv(($total/$working_days)* 60, 60)." h" .":".(($total/$working_days)* 60) % 60 ." m",
+            "average_hours_work_per_day" =>$working_days !=0 ? $this->getHoursMinutes($total_work/$working_days):"0",//intdiv(($total_work/$working_days)* 60, 60)." h" .":".(($total_work/$working_days)* 60) % 60 ." m",
             "extra_work" =>$extra_work_format,// $this->fix($total_hours- $required_time- $allowed_break) . ":".$this->fix($total_minutes),
             "breaks" => $complete_break_format,//$this->fix($total_hours- $total_hours_work).":".$this->fix($total_minutes- $total_minutes_work),
             "extra_break_minutes" => $extra_break_minutes = (($allowed_break * 60) - (($total_hours * 60 + $total_minutes)- ($total_hours_work* 60 + $total_minutes_work))),
@@ -422,7 +422,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function doCheckIn($type = ""){
         $day = $this->getDate("day");
         $day_sequance = date('w', strtotime($day));
-        $start_time = $this->getDate("time");
+        $start_time = $this->getDate();
         
         $customer_id = $this->getCurrentCustomerId();
         $collection = $this->_dayCollectionFactory->create();
@@ -448,13 +448,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         
         $hourCollection = $this->_hourCollectionFactory->create();
         $hourCollection->addFieldToFilter("day_id", $day_id);
-        $hourCollection->addFieldToFilter("end_time", "00:00:00");
+        $hourCollection->addFieldToFilter("end_time", "0000-00-00 00:00:00");
         $can_checkin = $hourCollection->getSize();
         if($can_checkin == 0 ) {
             $hour_model = $this->_objectManager->create('Zeo\Checkinout\Model\Hour');
             $hour_model->setData("day_id",$day_id);
             $hour_model->setData("start_time", $start_time);
-            $hour_model->setData("end_time", "00:00:00");
+            $hour_model->setData("end_time", "0000-00-00 00:00:00");
             $hour_model->setData("status", 1);
             
             if($type == "start_break") {
@@ -473,7 +473,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function doCheckOut($type= ""){
         
         $day = $this->getDate("day");
-        $end_time = $this->getDate("time");
+        $end_time = $this->getDate();
         
         $customer_id = $this->getCurrentCustomerId();
         $collection = $this->_dayCollectionFactory->create();
@@ -487,14 +487,24 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $day_id = $collection->getFirstItem()->getEntityId();
             $hourCollection = $this->_hourCollectionFactory->create();
             $hourCollection->addFieldToFilter("day_id", $day_id);
-            $hourCollection->addFieldToFilter("end_time", "00:00:00");
+            $hourCollection->addFieldToFilter("end_time", "0000-00-00 00:00:00");
             $can_checkin = $hourCollection->getSize();
             if($can_checkin == 0 ) {
                 return __("Error hour");
             }else {
                 $hour_model = $hourCollection->getFirstItem();
                 $start_time = $hour_model->getStartTime();
-                $counter = date('H:i:s', strtotime($end_time) - strtotime($start_time) );
+                
+                 //ST
+                $__total_times_seconds =  strtotime($end_time) - strtotime($start_time);
+                $__hours = (int)($__total_times_seconds/3600);
+                $__minutes = (int) (($__total_times_seconds%3600)/60);
+                $__seconds = (($__total_times_seconds%3600)%60);
+                
+                $timeFormat = sprintf('%02d:%02d:%02d', $__hours, $__minutes, $__seconds);
+                 //EN
+                $counter =  $timeFormat;//date('H:i:s', strtotime($end_time) - strtotime($start_time) );
+                
                 $decimalHours = $this->decimalHours($counter);
                 $decimalHours= ceil($decimalHours*1000)/1000;;
                 $hour_model->setData("end_time",$end_time);

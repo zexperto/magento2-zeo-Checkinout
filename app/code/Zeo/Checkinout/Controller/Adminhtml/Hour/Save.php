@@ -26,7 +26,19 @@ class Save extends \Zeo\Checkinout\Controller\Adminhtml\Hour
                 }
                 $data["entity_id"] = $id;
                 
-                $total_time = date('H:i:s', strtotime($data["end_time"]) - strtotime($data["start_time"]) );
+                
+                
+                // get the hours between dates
+                $total_times_seconds =  strtotime($data["end_time"]) - strtotime($data["start_time"]);
+                $hours = (int)($total_times_seconds/3600);
+                $minutes = (int) (($total_times_seconds%3600)/60);
+                $seconds = (($total_times_seconds%3600)%60);
+
+                $timeFormat = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+                // end get the date
+                
+              
+                $total_time = $timeFormat;
                                 
                 $decimalHours = $this->decimalHours($total_time);
                 

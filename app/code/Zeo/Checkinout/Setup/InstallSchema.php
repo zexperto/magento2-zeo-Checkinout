@@ -43,8 +43,8 @@ class InstallSchema implements InstallSchemaInterface
                 'Id'
             )
             ->addColumn('day_id', \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER, null, ['nullable' => false, 'unsigned' => true], 'Day')
-            ->addColumn('start_time', \Magento\Framework\DB\Ddl\Table::TYPE_TEXT, '8', ['nullable' => false ], 'Start Time' )
-            ->addColumn('end_time', \Magento\Framework\DB\Ddl\Table::TYPE_TEXT, '8', ['nullable' => false ], 'End Time' )
+            ->addColumn('start_time', \Magento\Framework\DB\Ddl\Table::TYPE_DATETIME, null, ['nullable' => true ], 'Start Time' )
+            ->addColumn('end_time', \Magento\Framework\DB\Ddl\Table::TYPE_DATETIME, null, ['nullable' => true ], 'End Time' )
             ->addColumn('total_time', \Magento\Framework\DB\Ddl\Table::TYPE_TEXT, '8', ['nullable' => false ], 'Total Time' )
             ->addColumn('total', \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL, '12,4', ['nullable' => false, 'default' => '0.0000'], 'Total' )
             ->addColumn('type', \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER, 1, ['default' => null], 'Type')
