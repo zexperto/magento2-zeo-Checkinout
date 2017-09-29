@@ -17,9 +17,7 @@ $is_checkedin_model = false;
 $start_time = "00:00:00";
 if($checkedin_model && $checkedin_model->getEntityId()) {
     $start_time = $checkedin_model->getStartTime();
-    
-   
-    
+     
     $counter = date('H:i:s', strtotime($time) - strtotime($start_time) ); // perform calculation
     $timer_on = 1;
     $is_checkedin_model = true;
@@ -137,9 +135,9 @@ require(['jquery', 'jquery/ui'], function($){
 		$(button).prop('disabled', true);
 		var FORM_KEY = $("input[name=form_key]").val();
 		;
-		var url = "<?php echo $this->getUrl('checkinout/index/CheckoutPost',['type'=>'{type}'])?>";
+		var url = "<?php echo $this->getUrl('checkinout/index/CheckoutPost',['type'=>'-type-'])?>";
 
-		var new_url = url.replace("{type}", type);
+		var new_url = url.replace("-type-", type);
 		var jqxhr = $.post( new_url,{ form_key: FORM_KEY }, function() {
 		  //alert("success");
 		})
@@ -189,7 +187,7 @@ require(['jquery', 'jquery/ui'], function($){
                 <span><?php echo __("Check in") ?></span>
             </button>
         <?php else:?>
-        	<?php if($checkedin_model->getType() == \Zeo\Checkinout\Model\System\Config\Type::BREAK):?>
+        	<?php if($checkedin_model->getType() == \Zeo\Checkinout\Model\System\Config\Type::_BREAK):?>
         	<button type="button" title="<?php echo __("End Break") ?>" id="checkoutFromBreak" class="action">
                 <span><?php echo __("End Break") ?></span>
             </button>
