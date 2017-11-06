@@ -7,6 +7,8 @@ $date =  date_format($date,"D, M d, Y");
 $time = $this->getTime();
 $type =  $this->getHelper()->getTypes();
 $result = $this->getReportResult();
+$today_total = $result["today_total"];
+
 $timer_on = 0;
 //$date1 = new DateTime("now", new DateTimeZone('America/Toronto') );
 // echo $date1->format('Y-m-d H:i:s');
@@ -19,6 +21,7 @@ if($checkedin_model && $checkedin_model->getEntityId()) {
     $start_time = $checkedin_model->getStartTime();
      
     $counter = date('H:i:s', strtotime($time) - strtotime($start_time) ); // perform calculation
+    $total_today = date('H:i:s', strtotime($time) - strtotime($start_time) + strtotime($today_total) ); 
     $timer_on = 1;
     $is_checkedin_model = true;
     
@@ -34,6 +37,28 @@ require(['jquery', 'jquery/ui'], function($){
 	function checkTime(i) {
 	    if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
 	    return i;
+	}
+	function startTimer(dev) {
+		
+		var time_shown = $(dev).text();
+	    var time_chunks = time_shown.split(":");
+	    var hour, mins, secs;
+	    hour=Number(time_chunks[0]);
+	    mins=Number(time_chunks[1]);
+	    secs=Number(time_chunks[2]) +1;
+		var today1 = new Date();
+		var today = new Date(today1.getYear(), today1.getMonth(), today1.getDay(), hour, mins, secs, "0");
+		 
+		var h = ("0" +today.getHours()).slice(-2);
+		var m = ("0" +today.getMinutes()).slice(-2);;
+		var s = ("0" +today.getSeconds()).slice(-2);;
+		
+		$(dev).text(h + ":" + m + ":" + s);
+
+		setTimeout(function() {
+	    	startTimer(dev);
+	    }, 1000)
+		    
 	}
 	function startTime() {
 		  var today = new Date();
@@ -78,9 +103,13 @@ require(['jquery', 'jquery/ui'], function($){
 	}
 		
 	$( document ).ready(function() {
-		startTime();
+		//startTime();
+		startTimer("#time-now");
 		if(timer_on ==1 ) {
-			startCount();
+			startTimer("#realtime");
+			startTimer("#realtime1");
+			realtime1
+			//startCount();
 		}
 	});
 
@@ -180,7 +209,12 @@ require(['jquery', 'jquery/ui'], function($){
 		</td>
 	</tr>
 	<tr>
-		<td><span id="realtime"><?php echo $counter?></span></td>
+		<td>
+		<span id="realtime"><?php echo $counter?></span>
+		<br/>
+		<span id="realtime">Total today <span id="realtime1"><?php echo  $today_total ?></span></span>
+		</td>
+		
 		<td>
 		<?php if($is_checkedin_model == false):?>
     		<button type="button" title="<?php echo __("Check in") ?>" id="checkin" class="action tocart primary">

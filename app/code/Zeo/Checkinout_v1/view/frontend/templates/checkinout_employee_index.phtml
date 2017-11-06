@@ -1,0 +1,50 @@
+<style>
+.online {
+    background-color: green;
+    color: #fff;
+    padding:5px;
+}
+.offline {
+    background-color: red;
+    color: #fff;
+    padding:5px;
+}
+
+.break {
+    background-color: #FFC107;
+    color: #fff;
+    padding:5px;
+}
+</style>
+<?php
+$employees = $this->getEmployees();
+?>
+<ul>
+	<?php foreach ($employees as $employee):?>
+	<?php $status = $this->getEmployeeStatus($employee->getEntityId());?>
+		<li>
+			<div>
+				<?php echo $employee->getName()?>
+				<?php 
+				if($status == \Zeo\Checkinout\Model\System\Config\Type::WORK) {
+				    $_status = __("Online");
+				    $class = "online";
+				} else if ($status == \Zeo\Checkinout\Model\System\Config\Type::BREAK) {
+				    $_status = __("In Break");
+				    $class = "break";
+				} else {
+				    $_status = __("Offline");
+				    $class = "offline";
+				}
+				?>
+				
+				<span class="<?php echo $class ;?>"> 
+				<?php 
+				echo $_status;
+				?>
+				</span>
+				
+			</div>
+		</li>
+	<?php endforeach;?>
+</ul>

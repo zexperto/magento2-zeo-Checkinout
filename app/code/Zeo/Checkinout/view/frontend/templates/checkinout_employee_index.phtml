@@ -29,7 +29,7 @@ $employees = $this->getEmployees();
 				if($status == \Zeo\Checkinout\Model\System\Config\Type::WORK) {
 				    $_status = __("Online");
 				    $class = "online";
-				} else if ($status == \Zeo\Checkinout\Model\System\Config\Type::BREAK) {
+				} else if ($status == \Zeo\Checkinout\Model\System\Config\Type::_BREAK) {
 				    $_status = __("In Break");
 				    $class = "break";
 				} else {

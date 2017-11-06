@@ -2,10 +2,10 @@
 
 	<head>
         <title>Report</title>
-        <!-- 
-		demo
+        
 		<css src="Zeo_Checkinout::css/css.css"/>
-		<script src="Zeo_Checkinout::js/js.js"/>
+		<!-- 
+		demo<script src="Zeo_Checkinout::js/js.js"/>
 		<css src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
 		<script src="path/file.js" defer="defer"/>
 		<link src="http://url.com" src_type="url"/>

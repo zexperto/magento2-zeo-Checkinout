@@ -38,8 +38,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_customerRepositoryInterface;
     
     
-    protected $_hours_per_day = 8;
-    protected $_break_per_day = 1;
+    protected $_minutes_per_day = 480;
+    protected $break_minutes_per_day = 60;
     
     /**
      *
@@ -264,6 +264,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $data = [];
         $total = 0;
         $total_work = 0;
+        $to_day = $this->getDate("day");
+        $today_total =  0;
         foreach ($collection as $day) {
             $item = $day->getData();
             $hours_collection= $this->_hourCollectionFactory->create();
@@ -275,10 +277,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             if(!in_array($day["day_sequence"],[6,7,0])){
                 $total += $line_total;
             }
+            if($to_day == $day->getData('day')) {
+                $today_total = $this->getHoursFromSeconds($line_total);
+            }
+            
             $item["line_total"] = $line_total;
             //$item["line_total_hours"] = intdiv($line_total * 60, 60)." h";
             //$item["line_total_minutes"] = ($line_total * 60) % 60 ." m";
-            $item["line_total_hours_format"] = $this->getHoursMinutes($line_total);
+            $item["line_total_hours_format"] = $this->getHoursFromSeconds($line_total);
             
             $line_total_work = $this->getSumDay($day["entity_id"],"0");
             if(!in_array($day["day_sequence"],[6,7,0])){
@@ -288,7 +294,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             //$item["line_total_hours_work"] = intdiv($line_total_work* 60, 60)." h";
             //$item["line_total_minutes_work"] = ($line_total_work* 60) % 60 ." m";
             
-            $item["line_total_hours_work_format"] = $this->getHoursMinutes($line_total_work);
+            $item["line_total_hours_work_format"] = $this->getHoursFromSeconds($line_total_work);
             
             $data[] = $item;
             
@@ -313,21 +319,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         $working_days = $this->getWorkingDays($start_date, $end_date, []);
        
-        $logged_time_format= $this->getHoursMinutes($total);
-        $complete_time_format = $this->getHoursMinutes($total_work);
-        $complete_break_format = $this->getHoursMinutes($total - $total_work);
-        $allowed_break= $working_days * $this->_break_per_day; 
-        $required_minutes = $working_days * $this->_hours_per_day * 60;
-        $required_time=  $this->getHoursMinutesFromMinutes($required_minutes);
+        $logged_time_format= $this->getHoursFromSeconds($total);
+        $complete_time_format = $this->getHoursFromSeconds($total_work);
+        $complete_break_format = $this->getHoursFromSeconds($total - $total_work);
+        $allowed_break_seconds = $working_days * $this->break_minutes_per_day * 60; 
+       // $required_minutes = $working_days * $this->_hours_per_day * 60;
+        $required_seconds = $working_days * $this->_minutes_per_day * 60;
+        $required_time=  $this->getHoursFromSeconds($required_seconds);
         
-        $extra_work_minutes = $this->getMinutesFromTotal($total) - $required_minutes;
-        $extra_work_format =   $this->getHoursMinutesFromMinutes($extra_work_minutes);// $this->getHoursMinutesFromMinutes($this->getMinutesFromTotal($total) - $required_time);
+        $extra_work_secondes = $total - $required_seconds;
+        $extra_work_format =   $this->getHoursFromSeconds($extra_work_secondes);
         
         
         $weekend_totals = $this->getWeekEndTotals($params);
-        $weekend_hoour_format = $this->getHoursMinutesFromMinutes($this->getMinutesFromTotal($weekend_totals));
+        $weekend_hoour_format = $this->getHoursFromSeconds($weekend_totals);
 
-        $total_logged_time_format = $this->getHoursMinutes($total + $weekend_totals);
+        $total_logged_time_format = $this->getHoursFromSeconds($total + $weekend_totals);
         
         $result = [
             "total_logged_time"   => $total_logged_time_format,
@@ -342,52 +349,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             "total_work" => $total_work,
             "employee_name" => $customer_name,
             "required_time" => $required_time,
-            "allowed_break" => $this->fix($allowed_break).":00",
+            "allowed_break" => $this->getHoursFromSeconds($allowed_break_seconds),
             
             "total_hours" =>($total_hours=  intdiv($total* 60, 60))." h",
             "total_minutes" => ($total_minutes = ($total* 60) % 60) ." m",
             "total_hours_work" => ($total_hours_work =intdiv($total_work* 60, 60))." h",
             "total_minutes_work" => ($total_minutes_work=($total_work* 60) % 60) ." m",
-            "average_hours_per_day" => $working_days != 0?$this->getHoursMinutes($total/$working_days):"0",//intdiv(($total/$working_days)* 60, 60)." h" .":".(($total/$working_days)* 60) % 60 ." m",
-            "average_hours_work_per_day" =>$working_days !=0 ? $this->getHoursMinutes($total_work/$working_days):"0",//intdiv(($total_work/$working_days)* 60, 60)." h" .":".(($total_work/$working_days)* 60) % 60 ." m",
+            "average_hours_per_day" => $working_days != 0?$this->getHoursFromSeconds($total/$working_days):"0",//intdiv(($total/$working_days)* 60, 60)." h" .":".(($total/$working_days)* 60) % 60 ." m",
+            "average_hours_work_per_day" =>$working_days !=0 ? $this->getHoursFromSeconds($total_work/$working_days):"0",//intdiv(($total_work/$working_days)* 60, 60)." h" .":".(($total_work/$working_days)* 60) % 60 ." m",
             "extra_work" =>$extra_work_format,// $this->fix($total_hours- $required_time- $allowed_break) . ":".$this->fix($total_minutes),
             "breaks" => $complete_break_format,//$this->fix($total_hours- $total_hours_work).":".$this->fix($total_minutes- $total_minutes_work),
-            "extra_break_minutes" => $extra_break_minutes = (($allowed_break * 60) - (($total_hours * 60 + $total_minutes)- ($total_hours_work* 60 + $total_minutes_work))),
-            "extra_break_hour" => $this->fix((int)($extra_break_minutes/60)).":".$this->fix((int)($extra_break_minutes%60)),
+            "extra_break_seconds" => $extra_break_seconds = (($allowed_break_seconds- ($total - $total_work))),// - (($total_hours * 60*60 + $total_minutes*60)- ($total_hours_work* 60*60 + $total_minutes_work*60))),
+            "extra_break_hour" => $this->getHoursFromSeconds($extra_break_seconds),// $this->fix((int)($extra_break_minutes/60)).":".$this->fix((int)($extra_break_minutes%60)),
             "weekend_hours" => $weekend_hoour_format,
+            "today_total" =>$today_total
         ];
         
         //($result["allowed_break"]-$result["breaks"])
        
         return  $result;
     }
-    public function getMinutesFromTotal($total) {
-        $hours = intdiv($total* 60, 60) ;
-        $minutes = ($total* 60) % 60;
-        $total_minutes = $hours * 60 + $minutes;
-        return $total_minutes;
-    }
-    public function getHoursMinutes($total) {
-
-        $hours = intdiv($total* 60, 60) ;
-        $minutes = ($total* 60) % 60;
-        $total_minutes = $hours * 60 + $minutes;
-        
-        return $this->fix($hours).":".$this->fix($minutes);
-    }
-    public function getHoursMinutesFromMinutes($minutes) {
-        
-        $prefix = "";
-        if($minutes < 0) {
-            $minutes = $minutes * -1;
-            $prefix = "-";
-        }
-        $hours = (int) ($minutes / 60);
-        $minutes = $minutes % 60;
-        
-        $result = $prefix.$this->fix($hours).":".$this->fix($minutes);
-        return  $result;
-    }
+   
     public function fix($number) {
         
         if($number<10 && $number>=0) {
@@ -398,6 +380,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         
         return $number;
     }
+    public function getHoursFromSeconds($seconds) {
+        $hours = intval ($seconds / 3600);
+        $minutes = intval(($seconds % 3600)/ 60);
+        $seocnds = ($seconds % 3600)% 60;
+        
+        $hours = sprintf("%02d",$hours);
+        $minutes = sprintf("%02d",$minutes);
+        $seocnds = sprintf("%02d",$seocnds);
+        
+        return $hours.":".$minutes.":".$seocnds;
+    }
+    
     public function getSumDay($day_id, $type = "")
     {
         $connection = $this->_resource->getConnection(\Magento\Framework\App\ResourceConnection::DEFAULT_CONNECTION);
@@ -458,7 +452,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $hour_model->setData("status", 1);
             
             if($type == "start_break") {
-                $hour_model->setData("type",\Zeo\Checkinout\Model\System\Config\Type::BREAK);
+                $hour_model->setData("type",\Zeo\Checkinout\Model\System\Config\Type::_BREAK);
             }else {
                 $hour_model->setData("type",\Zeo\Checkinout\Model\System\Config\Type::WORK);
             }
@@ -505,11 +499,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                  //EN
                 $counter =  $timeFormat;//date('H:i:s', strtotime($end_time) - strtotime($start_time) );
                 
-                $decimalHours = $this->decimalHours($counter);
-                $decimalHours= ceil($decimalHours*1000)/1000;;
+                
+                
+              //  $__total_times_seconds =  strtotime($end_time) - strtotime($start_time);
+                
                 $hour_model->setData("end_time",$end_time);
                 $hour_model->setData("total_time",$counter);
-                $hour_model->setData("total",$decimalHours);
+                $hour_model->setData("total",$__total_times_seconds);
                 $hour_model->save();
                 
                 if($type!= "") {
@@ -519,11 +515,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return true;
     }
-    function decimalHours($time)
-    {
-        $hms = explode(":", $time);
-        return ($hms[0] + ($hms[1]/60) + ($hms[2]/3600));
-    }
+    
     
     function getWorkingDays($startDate,$endDate,$holidays){
         // do strtotime calculations just once

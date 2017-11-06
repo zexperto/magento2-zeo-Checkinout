@@ -9,17 +9,19 @@ class Index extends \Magento\Framework\View\Element\Template {
     protected $_helper;
     
     
-    
+    protected  $_objectManager ;
     protected $_customerSession;
     
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
         \Magento\Customer\Model\Session $customerSession,
         \Zeo\Checkinout\Helper\Data $dataHelper,
+        \Magento\Framework\ObjectManagerInterface $objectManager,
         array $data = []
     ) {
         $this->_helper = $dataHelper;
         $this->_customerSession= $customerSession;
+        $this->_objectManager = $objectManager;
         parent::__construct($context, $data);
 
     }
@@ -47,10 +49,13 @@ class Index extends \Magento\Framework\View\Element\Template {
    
     public function getPostValues()
     {
-        return $this->_customerSession->getReportFormData();
+        $_customerSession = $this->_objectManager->create('\Magento\Customer\Model\Session');
+        return $_customerSession->getReportFormData();
     }
     public function getReportResult() {
-        $params= $this->_customerSession->getReportFormData();
+        $_customerSession = $this->_objectManager->create('\Magento\Customer\Model\Session');
+        $params= $_customerSession->getReportFormData();
+        
         return  $this->_helper->getReportResult($params);
     }
     public function getHelper() {

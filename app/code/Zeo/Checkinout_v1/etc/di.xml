@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    
+     <preference for="Zeo\Checkinout\Api\DayInterface" type="Zeo\Checkinout\Model\Api\Day" />
+
+     <preference for="Zeo\Checkinout\Api\Data\DayDataInterface" type="Zeo\Checkinout\Model\Api\Data\DayData" />
+
+     <preference for="Zeo\Checkinout\Api\HourInterface" type="Zeo\Checkinout\Model\Api\Hour" />
+
+     <preference for="Zeo\Checkinout\Api\Data\HourDataInterface" type="Zeo\Checkinout\Model\Api\Data\HourData" />
+
+</config>

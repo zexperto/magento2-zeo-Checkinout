@@ -27,9 +27,9 @@ class ReportPost extends \Magento\Customer\Controller\AbstractAccount
         $postObject = new \Magento\Framework\DataObject();
         $postObject->setData($post);
         
-        $this->_customerSession->setReportFormData($post);
-        
-        
+        $_customerSession = $this->_objectManager->create('\Magento\Customer\Model\Session');
+        $_customerSession->setReportFormData($post);
+       
         $this->_redirect('*/*/');
     }
 }
