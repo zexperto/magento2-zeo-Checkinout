@@ -8,7 +8,7 @@ $time = $this->getTime();
 $type =  $this->getHelper()->getTypes();
 $result = $this->getReportResult();
 $today_total = $result["today_total"];
-
+$total_today = $today_total;
 $timer_on = 0;
 //$date1 = new DateTime("now", new DateTimeZone('America/Toronto') );
 // echo $date1->format('Y-m-d H:i:s');
@@ -212,7 +212,7 @@ require(['jquery', 'jquery/ui'], function($){
 		<td>
 		<span id="realtime"><?php echo $counter?></span>
 		<br/>
-		<span id="realtime">Total today <span id="realtime1"><?php echo  $today_total ?></span></span>
+		<span id="realtime">Total today <span id="realtime1"><?php echo  $total_today ?></span></span>
 		</td>
 		
 		<td>
