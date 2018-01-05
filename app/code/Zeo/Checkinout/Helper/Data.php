@@ -327,8 +327,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $required_seconds = $working_days * $this->_minutes_per_day * 60;
         $required_time=  $this->getHoursFromSeconds($required_seconds);
         
+       
         $extra_work_secondes = $total - $required_seconds;
-        $extra_work_format =   $this->getHoursFromSeconds($extra_work_secondes);
+        $extra_work_format = $extra_work_secondes>0? $this->getHoursFromSeconds(abs($extra_work_secondes)):"- ".  $this->getHoursFromSeconds(abs($extra_work_secondes));
         
         
         $weekend_totals = $this->getWeekEndTotals($params);
