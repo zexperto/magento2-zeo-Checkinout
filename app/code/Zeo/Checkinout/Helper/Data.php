@@ -109,6 +109,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
          
          $collection = $this->_dayCollectionFactory->create();
          $collection->addFieldToFilter("day", $day);
+         $customer_id = $this->getCurrentCustomerId();
+         $collection->addFieldToFilter("customer_id", $id);
          $day_id = $collection->getFirstItem()->getEntityId();
          if($day_id >0) {
              $hourCollection = $this->_hourCollectionFactory->create();
@@ -519,6 +521,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     
     
     function getWorkingDays($startDate,$endDate,$holidays){
+        
+        $holidays [] = "2018-01-01";
         // do strtotime calculations just once
         $endDate = strtotime($endDate);
         $startDate = strtotime($startDate);
